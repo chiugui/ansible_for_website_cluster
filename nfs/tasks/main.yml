@@ -1,0 +1,59 @@
+- name: Install NFS Server 
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - rpcbind
+    - nfs-utils
+
+
+- name: Configure NFS Server
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  notify: Restart NFS Server
+
+- name: Create NFS Share Directory "{{ nfs_sharedir }}"
+  file:
+    path: "{{ nfs_sharedir }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    recurse: yes
+#  loop:
+#    - "{{ wordpress_dir }}"
+#    - "{{ zrlog_dir }}"
+
+- name: Started rpcbind and NFS Server
+  systemd:
+    name: "{{ item }}"
+    state:  started
+    enabled: yes
+  loop:
+    - rpcbind 
+    - nfs
+
+#sersync server
+- name: mkdir /sersync for sersync service
+  file:
+    path: /sersync
+    state: directory
+- name: install sersync service
+  copy:
+    src: sersync2
+    dest: /sersync/sersync2
+    mode: '0744'
+
+- name: install sersync service
+  template:
+    src: "{{ item.src }}" 
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: restart sersync service
+  loop:
+    - { src: confxml.xml.j2, dest: /sersync/confxml.xml, mode: '0644' }
+    - { src: sersync.passwd.j2, dest: /etc/sersync.passwd, mode: '0600' }
+- name: started sersync service
+  shell: cd /sersync/ &&
+         nohup ./sersync2 -dro confxml.xml &
+

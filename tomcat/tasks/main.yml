@@ -1,0 +1,21 @@
+- name: Install Jdk Env
+  yum:
+    name: java
+    state: present
+- name: mkdir /tomcat for tomacat service
+  file:
+    path: /tomcat
+    state: directory 
+- name: Download Tomcat Web Server
+  unarchive:
+    src: "{{ tomcat_name }}.tar.gz"
+    dest: /tomcat
+- name: create soft link to /tomcat/tomcat 
+  file:
+    src: "/tomcat/{{ tomcat_name }}"
+    dest: /tomcat/tomcat
+    state: link
+    
+- name: Started Tomcat Web Server
+  shell: cd /tomcat/tomcat/bin &&
+         nohup ./startup.sh &

@@ -1,0 +1,145 @@
+
+
+#1.关闭firewalld防火墙
+- name: Disabled Firewall Server
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+#2.关闭selinux
+- name: Disabled Selinux Server
+  selinux:
+    state: disabled
+
+
+###delete old yum repos
+- name: delete repos
+  shell: rm -fr  /etc/yum.repos.d/*
+
+
+#3.配置Base源、EPEL源
+- name: Add Base EPEL repository
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgcheck: yes
+    gpgkey: "{{ item.gpgkey }}"
+  loop:
+    - { name: base, description: Base repo , baseurl: 'http://mirrors.aliyun.com/centos/$releasever/os/$basearch', gpgkey: 'http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7' }
+    - { name: epel, description: Epel repo , baseurl: 'http://mirrors.aliyun.com/epel/7/$basearch', gpgkey: 'https://mirrors.aliyun.com/epel/RPM-GPG-KEY-EPEL-7' }
+
+#4.配置Nginx源、PHP-FPM源
+- name: Add Nginx repository
+  yum_repository:
+    name: nginx
+    enabled: yes
+    description: Nginx YUM repo
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck: no
+  when: ( ansible_hostname is match ("lb*") ) or
+        ( ansible_hostname is match ("web*") )
+
+- name: Add PHP-FPM repository
+  yum_repository:
+    name: php-fpm
+    description: PHP-FPM YUM repo
+    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
+    gpgcheck: no
+  when: ( ansible_hostname is match ("web*") )
+
+#5.安装基础软件包
+- name: Install Rpm Packages All
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+      - net-tools
+      - nfs-utils
+      - wget
+      - tree
+      - lrzsz
+      - vim
+      - unzip
+    #  - httpd-tools
+    # - bash-completion
+    #  - iftop
+    #  - iotop
+    # - glances
+    # - ntpdate
+
+#6.创建web使用的系统用户www（UID、GID = 666）
+- name: Create Group  "{{ web_group }}"
+  group:
+    name: "{{ web_group }}"
+    gid: "{{ web_id }}"
+
+- name: Create User "{{ web_user }}"
+  user:
+    name: "{{ web_user }}"
+    uid: "{{ web_id }}"
+    group: "{{ web_group }}"
+    shell: /sbin/nologin
+    create_home: no
+
+#7.调整文件描述符
+- name: Add or modify nofile soft limit
+  pam_limits:
+    domain: '*'
+    limit_type: "{{ item.limit_type }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+  loop:
+    - { limit_type: soft , limit_item: nofile , value: 100000 }
+    - { limit_type: hard , limit_item: nofile , value: 100000 }
+
+
+#.创建默认目录
+- name: create defaults dir for all host
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    state: directory
+    recurse: yes
+  loop:
+    - { path: /scripts, owner: root, group: root, mode: '0755' }
+    - { path: '/{{ rsync_backup }}', owner: '{{ web_user }}', group: '{{ web_group }}', mode: '0755' }
+
+
+#8.为每台节点添加备份脚本
+- name: Copy Backup Scripts File 
+  template:
+    src: client_push_data_server.sh.j2
+    dest: /scripts/client_push_data_server.sh
+    mode: '0755'
+
+#add rsync.passwd file
+- name: Copy rsync.passwd File
+  template:
+    src: rsync.passwd.j2
+    dest: /etc/rsync.passwd
+    mode: '0600'
+
+
+#9.定时执行该脚本
+- name: Configure crond backup
+  cron:
+    name: "This is Backup Scripts File"
+    minute: "00"
+    hour: "01"
+    job: "sh /scripts/client_push_data_server.sh &>/dev/null"
+
+#.定时同步时间从aliyun
+- name: sync date from aliyun ntp
+  cron:
+    name: "sync date from aliyun ntp"
+    minute: "30"
+    hour: "00"
+    job: "ntpdate ntp.aliyun.com  &>/dev/null"
+
+
+
+

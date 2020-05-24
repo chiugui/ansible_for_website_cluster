@@ -1,0 +1,16 @@
+#!/bin/bash
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+Host=$(hostname)
+IPdrs={{ ansible_eth0.ipv4.address }}
+#IPdrs=$(ip address show eth0|sed -nr 's#.*inet (.*)\/24.*$#\1#gp')
+Time=$(date +%F)
+Dir=/{{ rsync_backup }}/${Host}_${IPdrs}_${Time}
+###1.准备存储目录
+mkdir ${Dir} -p 
+###2.打包备份
+tar -czvhpf ${Dir}/config.tar.gz /etc/rc.local /etc/fstab /etc/hosts /etc/firewalld /script /var/spool/cron &>>/var/log/rsync.log
+md5sum ${Dir}/config.tar.gz &>${Dir}/config.md5sum
+###3.推送至备份服务器
+rsync -avz ${Dir} {{ rsync_auth }}@{{ rsync_server_ip }}::{{ rsync_backup }} --password-file=/etc/rsync.passwd &>>/var/log/rsync.log
+###4.保留最近7天的数据
+find /{{ rsync_backup }}/* -type d -mtime +7 |xargs rm -fr &>>/var/log/rsync.log

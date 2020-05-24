@@ -1,0 +1,10 @@
+TYPE=Ethernet
+BOOTPROTO=none
+NAME=eth0
+DEVICE=eth0
+ONBOOT=yes
+IPADDR={{ ansible_eth0.ipv4.address }}
+NETMASK={{ ansible_eth0.ipv4.netmask }}
+GATEWAY={{ default_gateway }}
+DNS1={{ default_dns1 }}
+DNS2={{ default_dns2 }}

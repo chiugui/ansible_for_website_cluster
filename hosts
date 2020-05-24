@@ -1,0 +1,16 @@
+[phpfpm]
+172.16.1.12 hostname=web01
+
+[tomcat]
+172.16.1.13 hostname=web02
+
+[lbs]
+172.16.1.10 hostname=lb01 keepalived_state=MASTER keepalived_priority=150
+172.16.1.11 hostname=lb02 keepalived_state=BACKUP keepalived_priority=120
+
+[redis]
+172.16.1.14 hostname=redis
+
+[nfs]
+172.16.1.15 hostname=nfs
+

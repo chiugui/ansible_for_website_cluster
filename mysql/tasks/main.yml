@@ -1,0 +1,31 @@
+- name: Install Mariadb Server
+  yum:
+    name: 
+      - mariadb
+      - mariadb-server
+      - MySQL-python
+    state: present
+
+- name: Started Mariadb Server
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+#mysql_db主要负责创建数据库（创建、导出、导入...）
+- name: Create Application Database
+  mysql_db:
+#    login_user: root
+#    login_password: 123456
+    name: "{{ mysql_db }}"
+    state: present
+
+- name: Allow User Access Database
+  mysql_user:
+#    login_user: root
+#    login_password: 123456
+    name: "{{ mysql_user }}"
+    password: '{{ mysql_password }}'
+    priv: '{{ mysql_priv }}'
+    host: '{{ mysql_host }}'
+    state: present

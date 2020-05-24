@@ -1,0 +1,28 @@
+
+- name: Install Rsync Server
+  yum:
+    name: rsync
+    state: present
+
+- name: Configure Rsync Server
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { src: rsyncd.conf.j2 , dest: /etc/rsyncd.conf , mode: "0644" }
+    - { src: rsyncd.passwd.j2 , dest: /etc/rsyncd.passwd , mode: "0600" }
+  notify: Restart Rsync Server
+
+- name: Create Sersync Directory "/{{ sersync_backup }}"
+  file:
+    path: "/{{ sersync_backup }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+
+- name: Started Rsync Server
+  systemd:
+    name: rsyncd
+    state: started
+    enabled: yes

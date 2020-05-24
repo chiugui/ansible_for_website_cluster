@@ -1,0 +1,62 @@
+#default vars
+default_gateway: 172.16.1.3
+default_dns1: 223.5.5.5
+default_dns2: 223.6.6.6
+
+
+
+
+
+#webs-vars(base)
+web_group: www
+web_user: www
+web_id: 666
+
+
+#php-fpm
+web_conn_redis: 172.16.1.14
+
+#mysql vars
+mysql_db: wp
+mysql_user: wp
+mysql_password: '123456'
+mysql_priv: '*.*:ALL'
+mysql_host: '172.16.1.%'
+
+#nfs vars
+nfs_sharedir: /data
+#nfs-sersync
+rsync_server_ip: '172.16.1.14'
+#nfs-sersync.passwd file path at /etc/sersync.passwd
+
+
+#rsync vars
+rsync_backup: backup
+rsync_auth: rsync
+rsync_passwd: '123456'
+#sersync vars
+sersync_backup: data
+sersync_auth: sersync
+sersync_passwd: '123456'
+#rsyncd_passwd file path at /etc/rsyncd.passwd
+#rsync_passwd file path at /etc/rsync.passwd
+
+#keepalived vars
+#tomcat
+tomcat_name: 'apache-tomcat-9.0.35'
+
+
+#webs-nginx for xxx.com
+
+
+#webs-tomcat for xxx.com
+
+
+#keepalived and proxy for xxx.com
+#keepalived_vip var to group_vars/xxx.com
+keepalived_interface: eth0
+keepalived_vip: '172.16.1.2'
+
+
+#keepalived for mysql(mysql-kp)
+

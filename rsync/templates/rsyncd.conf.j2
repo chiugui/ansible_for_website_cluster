@@ -1,0 +1,20 @@
+uid = {{ web_user }}
+gid = {{ web_group }}
+port = 873
+fake super = yes
+use chroot = no
+max connections = 200
+timeout = 600
+ignore errors
+read only = false
+list = false
+log file = /var/log/rsyncd.log
+secrets file = /etc/rsyncd.passwd
+################################
+[{{ rsync_backup }}]
+path = /{{ rsync_backup }}
+auth users = {{ rsync_auth }}
+
+[{{ sersync_backup }}]
+path = /{{ sersync_backup }}
+auth users = {{ sersync_auth }}

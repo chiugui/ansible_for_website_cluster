@@ -1,0 +1,34 @@
+- hosts: all
+  roles:
+    - role: base
+
+
+- hosts: lbs
+  roles:
+    - role: keepalived
+
+
+- hosts: phpfpm
+  roles:
+    - role: nginx
+    - role: php-fpm
+
+
+- hosts: tomcat
+  roles:
+    - role: nginx
+    - role: tomcat
+
+
+- hosts: redis
+  roles:
+    - role: redis
+    - role: rsync
+
+
+- hosts: nfs
+  roles:
+    - role: nfs
+    - role: mysql
+
+ 

@@ -1,0 +1,16 @@
+- name: Install Keepalived Server
+  yum:
+    name: keepalived
+    state: present
+
+- name: Configure Keepalived Server
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  notify: Restart  Keepalived Server
+
+- name: Started Keepalived Server
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes

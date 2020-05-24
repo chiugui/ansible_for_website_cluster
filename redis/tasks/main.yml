@@ -1,0 +1,22 @@
+- name: Install Redis Server
+  yum:
+    name: redis
+    state: present
+
+- name: Configure Redis Server
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis.conf
+    owner: redis
+    group: root
+    mode: '0640'
+    backup: yes
+  notify: Restart Redis Server
+
+- name: Started Redis Server
+  systemd:
+    name: redis
+    state: started
+    enabled: yes
+
+
