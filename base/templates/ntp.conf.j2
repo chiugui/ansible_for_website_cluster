@@ -1,0 +1,25 @@
+driftfile /var/lib/ntp/drift
+restrict default nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict ::1
+
+{% if ansible_hostname is search("manger") %}
+restrict {{ansible_eth0.ipv4.network}}   mask {{ansible_eth0.ipv4.netmask}}  nomodify notrap
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+server ntp.aliyun.com perfer iburst
+{% else %}
+server {{ manger_ntpserver }} perfer iburst
+{% endif %}
+
+
+
+# local clock
+server  127.127.1.0
+fudge   127.127.1.0 stratum 5
+
+includefile /etc/ntp/crypto/pw
+keys /etc/ntp/keys
+disable monitor

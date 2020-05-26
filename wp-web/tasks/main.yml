@@ -1,0 +1,22 @@
+- name: unarchive wp.tar.gz to /code/wp
+  unarchive:
+    src: wordpress-5.4-zh_CN.tar.gz
+    dest: /code/
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+
+
+
+- name: add wp.osker.com vhost to nginx
+  template:
+    src: wp.osker.com.conf.j2
+    dest: "/etc/nginx/conf.d/wp.osker.com.conf"
+  notify: Restart Nginx Server
+
+#- name: mount "{{ vhost_name2 }}" static files to "{{ wecenter_dir }}"
+#  mount:
+#    src: "{{ nfs_vip }}:{{ wecenter_dir }}"
+#    path: "{{ web_code }}/{{ wecenter }}/uploads"
+#    opts: defaults
+#    fstype: nfs
+#    state: mounted

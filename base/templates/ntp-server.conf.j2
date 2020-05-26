@@ -1,0 +1,15 @@
+driftfile /var/lib/ntp/drift
+restrict default nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict ::1
+
+restrict 172.16.1.0 mask 255.255.255.0 nomodify notrap
+server {{ groups['manger'] }} perfer iburst
+
+# local clock
+server  127.127.1.0
+fudge   127.127.1.0 stratum 10
+
+includefile /etc/ntp/crypto/pw
+keys /etc/ntp/keys
+disable monitor

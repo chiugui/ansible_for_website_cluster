@@ -13,16 +13,16 @@
     dest: /etc/exports
   notify: Restart NFS Server
 
-- name: Create NFS Share Directory "{{ nfs_sharedir }}"
+- name: Create NFS Share Directory
   file:
-    path: "{{ nfs_sharedir }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ web_user }}"
     group: "{{ web_group }}"
     recurse: yes
-#  loop:
-#    - "{{ wordpress_dir }}"
-#    - "{{ zrlog_dir }}"
+  loop:
+    - "{{ wecenter_dir }}"
+    - "{{ zrlog_dir }}"
 
 - name: Started rpcbind and NFS Server
   systemd:
@@ -44,7 +44,7 @@
     dest: /sersync/sersync2
     mode: '0744'
 
-- name: install sersync service
+- name: configure sersync files
   template:
     src: "{{ item.src }}" 
     dest: "{{ item.dest }}"

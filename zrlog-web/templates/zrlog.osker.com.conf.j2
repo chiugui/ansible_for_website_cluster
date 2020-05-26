@@ -1,0 +1,10 @@
+server  {
+	listen {{ nginx_port3 }};
+	server_name {{ vhost_name3 }};
+	root {{ web_code }}/{{ zrlog }}/ROOT;
+
+	location / {
+		index index.php;
+	}
+
+}

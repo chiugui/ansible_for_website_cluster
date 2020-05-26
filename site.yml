@@ -1,34 +1,69 @@
+#初始化主机ip地址和hostname
+- hosts: all
+  roles:
+    - role: default
+
+#优化主机（关闭防火墙selinux，配置repo等）
 - hosts: all
   roles:
     - role: base
 
 
-- hosts: lbs
-  roles:
-    - role: keepalived
 
 
-- hosts: phpfpm
-  roles:
-    - role: nginx
-    - role: php-fpm
+#- hosts: phpfpm
+#  roles:
+#    - role: nginx
+#    - role: php-fpm
 
 
-- hosts: tomcat
-  roles:
-    - role: nginx
-    - role: tomcat
 
 
 - hosts: redis
   roles:
     - role: redis
+- hosts: rsync
+  roles:
     - role: rsync
 
 
 - hosts: nfs
   roles:
     - role: nfs
+- hosts: mysql
+  roles:
     - role: mysql
 
- 
+
+#- hosts: lbs
+#  roles:
+#    - role: keepalived
+#搭建网站时候会dependencies keepalived role，设置vip
+#phpmyadmin网站搭建 
+- hosts: phpfpm
+  roles:
+    - role: phpmyadmin-web
+- hosts: lbs
+  roles:
+  - role: phpmyadmin-lbs
+
+#调试wecenter
+- hosts: phpfpm
+  roles:
+    - role: zh-web
+- hosts: lbs
+  roles:
+    - role: zh-lbs
+#
+#
+#
+#部署zrlog web时会dependencies nginx和tomcat
+- hosts: tomcat
+  roles:
+    - role: zrlog-web
+  tags: zrlog
+
+- hosts: lbs
+  roles:
+    - role: zrlog-lbs
+  tags: zrlog

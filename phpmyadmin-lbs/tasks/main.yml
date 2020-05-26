@@ -1,0 +1,12 @@
+- name: Configure "{{ vhost_name }}" Proxy Upstream
+  template:
+    src: "proxy_{{ vhost_name }}.conf.j2"
+    dest: "/etc/nginx/conf.d/proxy_{{ vhost_name }}.conf"
+  notify: Restart Nginx Server
+
+- name: Check Proxy Confnigure 
+  shell: nginx -t
+  register: check_ngx
+  changed_when:
+    - false
+    - check_ngx.stdout.find("successful")

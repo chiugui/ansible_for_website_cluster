@@ -1,0 +1,10 @@
+- name: Restart Tomcat Service
+  shell: cd /tomcat/tomcat/bin &&
+         nohup ./shutdown.sh &&
+         nohup ./startup.sh &
+
+- name: Restart Nginx Service
+  systemd:
+    name: nginx
+    state: restarted
+

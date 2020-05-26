@@ -1,8 +1,16 @@
 ####初始化系统IP和hostname
-- name: setup static ip address
+- name: copy hosts file
+  copy:
+    src: hosts
+    dest: /etc/hosts
+    backup: yes
+
+#将所有主机的dhcp配置为静态内网ip，网卡为：eth0
+- name: setup static ip address at "{{ eth0 }}"
   template:
-    src: eth0.j2
-    dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+    src: "{{ eth0 }}.j2"
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ eth0 }}"
+    backup: yes
 
 #- name: template dns
 #  template:
@@ -12,6 +20,7 @@
 - name: reset hostname
   hostname:
     name: "{{ hostname }}" 
+
 
 
 - name: restart network

@@ -1,4 +1,4 @@
-- name: Install Jdk Env
+- name: Install Jdk Env For Tomcat
   yum:
     name: java
     state: present
@@ -15,7 +15,30 @@
     src: "/tomcat/{{ tomcat_name }}"
     dest: /tomcat/tomcat
     state: link
-    
+
+#配置tomcat缓存到redis中
+- name: copy some .jar packages to lib/
+  copy:
+    src: "{{ item }}"
+    dest: /tomcat/tomcat/lib
+  loop:
+    - commons-pool2-2.6.2.jar
+    - jedis-3.0.1.jar
+    - slf4j-api-1.7.26.jar
+    - tomcat-cluster-redis-session-manager-4.0.jar
+- name: copy redis-data-cache.properties to conf/
+  template:
+    src: redis-data-cache.properties.j2
+    dest: /tomcat/tomcat/conf/redis-data-cache.properties
+
+- name: copy context.xml to conf/
+  copy:
+    src: context.xml
+    dest: /tomcat/tomcat/conf
+#缓存配置完   
+
+
+ 
 - name: Started Tomcat Web Server
   shell: cd /tomcat/tomcat/bin &&
          nohup ./startup.sh &

@@ -1,0 +1,23 @@
+#使用nginx配置zrlog的负载均衡proxy_zrlog(附带redis.osker.com的负载均衡),如果配置文件发生改变，触发restart nginx
+- name: configure proxy zrlog.xxx.com 
+  template:
+    src: "proxy_{{ vhost_name3 }}.conf.j2"
+    dest: "/etc/nginx/conf.d/proxy_{{ vhost_name3 }}.conf"
+    backup: yes
+  notify: Restart Nginx Service
+
+#传送ssl证书到负载均衡上
+- name: unarchive https_ssl to lbs
+  unarchive:
+    src: https_chongking.com.zip
+    dest: /etc/nginx/
+
+
+
+#添加nginx配置文件后检查配置文件语法是否正确
+- name: check proxy "{{ vhost_name3 }}" configure file for nginx
+  shell: nginx -t
+  register: ck_ngx
+  changed_when:
+    - false
+    - ck_ngx.stdout.find('seccessful')

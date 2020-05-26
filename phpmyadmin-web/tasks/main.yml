@@ -1,0 +1,24 @@
+
+- name: unarchive phpmyadmin packages to  "{{ web_code }}"
+  unarchive:
+    src: "{{ phpmyadmin }}.zip"
+    dest: "{{ web_code }}"
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+
+- name: template phpmyadmin_config.inc.php.j2 file
+  template:
+    src: config.inc.php.j2
+    dest: "{{ web_code }}/{{ phpmyadmin }}/config.inc.php"
+    owner: www
+    group: www
+    mode: 0644
+    backup: yes
+
+- name: add "{{ vhost_name }}"vhost to nginx
+  template:
+    src: "{{ vhost_name }}.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ vhost_name }}.conf"
+  notify: Restart Nginx Server    
+
+ 

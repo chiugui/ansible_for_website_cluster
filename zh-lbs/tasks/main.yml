@@ -1,0 +1,19 @@
+- name: configure proxy "{{ vhost_name2 }}" 
+  template:
+    src: "proxy_{{ vhost_name2 }}.conf.j2"
+    dest: "/etc/nginx/conf.d/proxy_{{ vhost_name2 }}.conf"
+    backup: yes
+  notify: Restart Nginx Service
+
+#传送ssl证书到负载均衡上
+- name: unarchive https_ssl to lbs
+  unarchive:
+    src: https_chongking.com.zip
+    dest: /etc/nginx/
+
+- name: check proxy "{{ vhost_name2 }}" configure file for nginx
+  shell: nginx -t
+  register: ck_ngx
+  changed_when:
+    - false
+    - ck_ngx.stdout.find('seccessful')

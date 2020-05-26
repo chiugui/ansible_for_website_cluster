@@ -17,15 +17,23 @@
   mysql_db:
 #    login_user: root
 #    login_password: 123456
-    name: "{{ mysql_db }}"
+    name: "{{ item }}"
     state: present
+  loop:
+    - phpmyadmin
+    - zh
+    - zrlog
 
 - name: Allow User Access Database
   mysql_user:
 #    login_user: root
 #    login_password: 123456
-    name: "{{ mysql_user }}"
-    password: '{{ mysql_password }}'
-    priv: '{{ mysql_priv }}'
-    host: '{{ mysql_host }}'
+    name: "{{ item.name }}"
+    password: '{{ item.password }}'
+    priv: '{{ item.priv }}'
+    host: '{{ item.host }}'
     state: present
+  loop:
+    - { name: phpmyadmin, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }
+    - { name: zh, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }
+    - { name: zrlog, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }

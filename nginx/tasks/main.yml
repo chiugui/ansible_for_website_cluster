@@ -14,15 +14,27 @@
     path: /etc/nginx/conf.d/default.conf
     state: absent
 
-
-- name: Check Nginx Configure
-  shell: nginx -t
-  register: check_ngx
-  changed_when:
-    - false
-    - check_ngx.stdout.find("successful")
+#应用模块调用时候会check nginx
+#- name: Check Nginx Configure
+#  shell: nginx -t
+#  register: check_ngx
+#  changed_when:
+#    - false
+#    - check_ngx.stdout.find("successful")
 
 - name: Started Nginx Server
   systemd:
     name: nginx
     state: started
+    enabled: yes
+
+
+- name: create dir "{{ web_code }}" for web-code
+  file:
+    path: "{{ web_code }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: '0755'
+    recurse: yes
+

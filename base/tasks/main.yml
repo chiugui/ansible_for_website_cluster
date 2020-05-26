@@ -1,4 +1,11 @@
 
+#给lbs主机配置静态外网ip，网卡为：eth1
+#- name: setup static ip address at "{{ eth1 }}"
+#  template:
+#    src: "{{ eth1 }}.j2"
+#    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ eth1 }}"
+#    backup: yes
+#  when: ( ansible_hostname is match ("*lbs*") )
 
 #1.关闭firewalld防火墙
 - name: Disabled Firewall Server
@@ -14,10 +21,13 @@
 
 
 ###delete old yum repos
-- name: delete repos
-  shell: rm -fr  /etc/yum.repos.d/*
+- name: mv  old-repo files
+  shell: mv  /etc/yum.repos.d/* /tmp
 
 
+
+
+#待优化yum源，解析到管理机下载源
 #3.配置Base源、EPEL源
 - name: Add Base EPEL repository
   yum_repository:
@@ -31,26 +41,27 @@
     - { name: epel, description: Epel repo , baseurl: 'http://mirrors.aliyun.com/epel/7/$basearch', gpgkey: 'https://mirrors.aliyun.com/epel/RPM-GPG-KEY-EPEL-7' }
 
 #4.配置Nginx源、PHP-FPM源
-- name: Add Nginx repository
+- name: Add Nginx Repository
   yum_repository:
     name: nginx
     enabled: yes
     description: Nginx YUM repo
-    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    baseurl: 'http://nginx.org/packages/centos/$releasever/$basearch/'
     gpgcheck: no
-  when: ( ansible_hostname is match ("lb*") ) or
-        ( ansible_hostname is match ("web*") )
+  when: ( ansible_hostname is match (".*lbs.*") ) or
+        ( ansible_hostname is match (".*web.*") )
 
 - name: Add PHP-FPM repository
   yum_repository:
     name: php-fpm
     description: PHP-FPM YUM repo
-    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
+#    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
+    baseurl: http://192.168.199.191/yum/el7/x86_64/
     gpgcheck: no
-  when: ( ansible_hostname is match ("web*") )
+  when: ( ansible_hostname is match (".*phpfpm.*") )
 
 #5.安装基础软件包
-- name: Install Rpm Packages All
+- name: Install base rpms packages
   yum:
     name: "{{ item }}"
     state: present
@@ -62,13 +73,16 @@
       - lrzsz
       - vim
       - unzip
-    #  - httpd-tools
-    # - bash-completion
-    #  - iftop
-    #  - iotop
-    # - glances
-    # - ntpdate
-
+      - httpd-tools
+      - bash-completion
+      - iftop
+      - iotop
+      - glances
+      - ntp
+      - ntpdate
+      - rsync
+      - rpcbind
+      - nfs-utils
 #6.创建web使用的系统用户www（UID、GID = 666）
 - name: Create Group  "{{ web_group }}"
   group:
@@ -96,7 +110,7 @@
 
 
 #.创建默认目录
-- name: create defaults dir for all host
+- name: create base dirs /scripts and '/{{ rsync_backup }}' for all host
   file:
     path: "{{ item.path }}"
     owner: "{{ item.owner }}"
@@ -132,14 +146,26 @@
     hour: "01"
     job: "sh /scripts/client_push_data_server.sh &>/dev/null"
 
-#.定时同步时间从aliyun
-- name: sync date from aliyun ntp
-  cron:
-    name: "sync date from aliyun ntp"
-    minute: "30"
-    hour: "00"
-    job: "ntpdate ntp.aliyun.com  &>/dev/null"
-
-
-
-
+##.定时同步时间从aliyun
+#- name: sync date from aliyun ntp
+#  cron:
+#    name: "sync date from aliyun ntp"
+#    minute: "30"
+#    hour: "00"
+#    job: "ntpdate ntp.aliyun.com  &>/dev/null"
+#
+#使用ntpd服务同步主机时间,ntp.conf里使用if判断是否为manger主机，若是：使用服务端配置。
+- name: copy ntp.conf and ntpd files to all hosts
+  template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    backup: yes
+  loop:
+    - { src: ntp.conf.j2, dest: /etc/ntp.conf }
+    - { src: ntpd.j2, dest: /etc/sysconfig/ntpd }
+  tags: ntp
+- name: use ntpd service sync time from mangager-host
+  systemd:
+    name: ntpd
+    state: restarted
+    enabled: yes

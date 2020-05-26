@@ -1,0 +1,55 @@
+- name: mkdir "{{ web_code }}/{{ zrlog }}" for zrlog code
+  file:
+    path: "{{ web_code }}/{{ zrlog }}"
+    state: directory
+
+
+- name: mkdir "{{ web_code }}"/redis for redis.osker.com code
+  file:
+    path: "{{ web_code }}/redis/ROOT"
+    state: directory
+
+
+- name: download zrlog code to host
+  copy:
+    src: ROOT.war
+    dest: "{{ web_code }}/{{ zrlog }}"
+
+#重启tomcat自动解压ROOT.war包，生成ROOT目录
+- name: Restart Tomcat Service
+  shell: cd /tomcat/tomcat/bin &&
+         nohup ./shutdown.sh &&
+         nohup ./startup.sh &
+
+
+
+- name: template redis.osker.com code(index.jsp)
+  template:
+    src: index.jsp.j2
+    dest: "{{ web_code }}/redis/ROOT/index.jsp"
+
+- name: add vhost "{{ vhost_name }}" for zrlog
+  template:
+    src: server.xml.j2
+    dest: /tomcat/tomcat/conf/server.xml
+  notify: Restart Tomcat Service
+
+#负载均衡调度静态资源到nginx上处理，这里创建一个虚拟主机来接收请求，虚拟主机的root目录和tomcat目录应该相同
+- name: nginx dealing with static resources, create vhost to nginx
+  template:
+    src: "{{ vhost_name3 }}.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ vhost_name3 }}.conf"
+    backup: yes
+  notify: Restart Nginx Service
+
+
+
+
+#- name: mount "{{ vhost_name3 }}" static files to "{{ zrlog_dir }}"
+#  mount:
+#    src: "{{ nfs_vip }}:{{ zrlog_dir }}"
+#    path: "{{ web_code }}/{{ zrlog }}/ROOT/attached"
+#    opts: defaults
+#    fstype: nfs
+#    state: mounted
+#  ignore_errors: yes

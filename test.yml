@@ -1,0 +1,8 @@
+#- hosts: all
+#  roles:
+#    - role: default
+- hosts: all
+  roles:
+    - role: base
+
+

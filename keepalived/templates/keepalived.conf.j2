@@ -2,7 +2,7 @@ global_defs {
     router_id {{ansible_hostname}}
 }
     vrrp_instance VI_1 {
-    state {{ keepalived_state}}
+    state {{ keepalived_state }}
     priority {{ keepalived_priority }}
 
     interface {{ keepalived_interface }}

@@ -1,0 +1,9 @@
+<body>
+<%
+//HttpSession session = request.getSession(true);
+System.out.println(session.getCreationTime());
+out.println("<br> {{ ansible_fqdn }} SESSION ID:" + session.getId() + "<br>");
+out.println("Session created time is :" + session.getCreationTime()
++ "<br>");
+%>
+</body>

@@ -1,16 +1,45 @@
-[phpfpm]
-172.16.1.12 hostname=web01
-
+#[phpfpm]
+#172.16.1.18 hostname=web01
+#172.16.1.22 hostname=web03
+#
+#[tomcat]
+#172.16.1.19 hostname=web02
+#
+#[lbs]
+#172.16.1.16 hostname=lb01 keepalived_state=MASTER keepalived_priority=150
+#172.16.1.17 hostname=lb02 keepalived_state=BACKUP keepalived_priority=120
+#
+#[redis]
+#172.16.1.20 hostname=redis
+#
+#[nfs]
+#172.16.1.21 hostname=nfs
+#
+#[webtest]
+#172.16.1.23 hostname=webtest
+#
 [tomcat]
-172.16.1.13 hostname=web02
+172.16.1.16       hostname=cqecs-web-tomcat01
+
+[phpfpm]
+172.16.1.17      hostname=cqecs-web-phpfpm01
+172.16.1.18      hostname=cqecs-web-phpfpm02
 
 [lbs]
-172.16.1.10 hostname=lb01 keepalived_state=MASTER keepalived_priority=150
-172.16.1.11 hostname=lb02 keepalived_state=BACKUP keepalived_priority=120
+172.16.1.19  hostname=cqecs-lbs-ngx01 keepalived_state=MASTER keepalived_priority=150
+172.16.1.20  hostname=cqecs-lbs-ngx02 keepalived_state=BACKUP keepalived_priority=120
 
 [redis]
-172.16.1.14 hostname=redis
+172.16.1.21      hostname=cqecs-cache-redis01
+
+[mysql]
+172.16.1.24       hostname=cqecs-db-mariadb01
+
+[rsync]
+172.16.1.25     hostname=cqecs-backup-rsync01
 
 [nfs]
-172.16.1.15 hostname=nfs
+172.16.1.26        hostname=cqecs-share-nfs01
 
+[manger]
+172.16.1.4       hostname=cqecs-manger-ssh01

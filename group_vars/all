@@ -1,10 +1,15 @@
 #default vars
 default_gateway: 172.16.1.3
-default_dns1: 223.5.5.5
-default_dns2: 223.6.6.6
+default_dns1: 223.6.6.6
+default_dns2: 223.5.5.5
 
+#eth0默认为内网网卡，eth1为外网网卡。
+eth0: eth0
+eth1: eth1
+default_gateway_eth1: 10.0.0.2
 
-
+#ntpdserver var
+manger_ntpserver: cqecs-manger-ssh01
 
 
 #webs-vars(base)
@@ -12,23 +17,36 @@ web_group: www
 web_user: www
 web_id: 666
 
+#nginx vars
+web_code: /code
+
 
 #php-fpm
-web_conn_redis: 172.16.1.14
+web_conn_redis: 172.16.1.21
 
 #mysql vars
-mysql_db: wp
-mysql_user: wp
-mysql_password: '123456'
-mysql_priv: '*.*:ALL'
-mysql_host: '172.16.1.%'
+#创建数据库以及用户，已经写死在mysql-role中
+# - { name: phpmyadmin, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }
+# - { name: zh, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }
+# - { name: zrlog, password: '123456', priv: '*.*:ALL', host: '172.16.1.%' }
+
+
+
 
 #nfs vars
+wecenter_dir: /data/zh
+zrlog_dir: /data/zrlog
 nfs_sharedir: /data
-#nfs-sersync
-rsync_server_ip: '172.16.1.14'
-#nfs-sersync.passwd file path at /etc/sersync.passwd
 
+#nfs-vip
+nfs_vip: 172.16.1.24
+
+
+#nfs-sersync
+rsync_server_ip: '172.16.1.20'
+#nfs-sersync.passwd file path at /etc/sersync.passwd
+#dir for nfs app(phpmyadmin or wecenter and so on)
+#nfs_app_dir: /phpmyadmin
 
 #rsync vars
 rsync_backup: backup
@@ -46,17 +64,33 @@ sersync_passwd: '123456'
 tomcat_name: 'apache-tomcat-9.0.35'
 
 
-#webs-nginx for xxx.com
+#webs-nginx for phpmyadmin.com
+phpmyadmin: phpMyAdmin-5.0.2-all-languages
+vhost_name: php.osker.com
+nginx_port: 80
+#phpmyadmin-config  manger mysql ip
+mysql_vip: 172.16.1.21
 
 
-#webs-tomcat for xxx.com
+#webs-nginx for wecenter.com
+wecenter: WeCenter_3-5-0
+vhost_name2: zh.osker.com
+nginx_port2: 80
 
 
-#keepalived and proxy for xxx.com
-#keepalived_vip var to group_vars/xxx.com
+#webs-tomcat for zrlog.com
+zrlog: zrlog
+vhost_name3: zrlog.osker.com
+tomcat_port3: 8080
+nginx_port3: 80
+
+
+#keepalived_vip var for proxy
 keepalived_interface: eth0
 keepalived_vip: '172.16.1.2'
 
 
-#keepalived for mysql(mysql-kp)
-
+#keepalived for mysql
+#keepalived_vip var to group_vars/mysql
+#keepalived_interface: eth0
+#keepalived_vip: '172.16.1.2'
