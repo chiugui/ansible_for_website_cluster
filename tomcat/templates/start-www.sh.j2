@@ -1,0 +1,7 @@
+#!/bin/bash
+## set user tomcat to /bin/bash to start server
+usermod -s /bin/bash www
+## use tomcat user to start server
+su - www -c /tomcat/tomcat/bin/startup.sh
+## set user tomcat to /sbin/nologin 
+usermod -s /sbin/nologin www

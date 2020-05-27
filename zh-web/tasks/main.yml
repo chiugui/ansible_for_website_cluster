@@ -14,11 +14,21 @@
     dest: "/etc/nginx/conf.d/{{ vhost_name2 }}.conf"
   notify: Restart Nginx Server
 
-#- name: mount "{{ vhost_name2 }}" static files to "{{ wecenter_dir }}"
-#  mount:
-#    src: "{{ nfs_vip }}:{{ wecenter_dir }}"
-#    path: "{{ web_code }}/{{ wecenter }}/uploads"
-#    opts: defaults
-#    fstype: nfs
-#    state: mounted
-#  ignore_errors: yes
+
+
+
+#mount前启动rpcbind服务
+- name: systemctl start and enable rpcbind
+  systemd:
+    name: rpcbind
+    state: restarted
+    enabled: yes
+
+- name: mount "{{ vhost_name2 }}" static files to "{{ wecenter_dir }}"
+  mount:
+    src: "{{ nfs_vip }}:{{ wecenter_dir }}"
+    path: "{{ web_code }}/{{ wecenter }}/uploads"
+    opts: defaults
+    fstype: nfs
+    state: mounted
+  ignore_errors: yes

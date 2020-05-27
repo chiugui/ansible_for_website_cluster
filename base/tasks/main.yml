@@ -56,9 +56,13 @@
     name: php-fpm
     description: PHP-FPM YUM repo
 #    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
-    baseurl: http://192.168.199.191/yum/el7/x86_64/
+    baseurl: http://www.chongking.com/php-fpm/
     gpgcheck: no
   when: ( ansible_hostname is match (".*phpfpm.*") )
+
+#yum makecache
+- name: yum makecache
+  shell: yum makecache
 
 #5.安装基础软件包
 - name: Install base rpms packages
@@ -95,7 +99,7 @@
     uid: "{{ web_id }}"
     group: "{{ web_group }}"
     shell: /sbin/nologin
-    create_home: no
+    create_home: yes
 
 #7.调整文件描述符
 - name: Add or modify nofile soft limit

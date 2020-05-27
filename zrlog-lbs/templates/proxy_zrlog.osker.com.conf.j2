@@ -1,13 +1,13 @@
 #Dynamic resources
 upstream {{ vhost_name3 }}{{ tomcat_port3 }} {
-{% for host in groups['tomcat']%}
+{% for host in groups['tomcat'] %}
 	server {{ host }}:{{ tomcat_port3 }};
 {% endfor %}
 }
 
 #static resources
 upstream {{ vhost_name3 }}{{ nginx_port3 }} {
-{% for host in groups['tomcat']%}
+{% for host in groups['tomcat'] %}
 	server {{ host }}:{{ nginx_port3 }};
 {% endfor %}
 }
@@ -15,7 +15,7 @@ upstream {{ vhost_name3 }}{{ nginx_port3 }} {
 
 #tomcat test redis session
 upstream redis.osker.com { 	
-{% for host in groups['tomcat']%}
+{% for host in groups['tomcat'] %}
         server {{ host }}:{{ tomcat_port3 }};
 {% endfor %}
 }

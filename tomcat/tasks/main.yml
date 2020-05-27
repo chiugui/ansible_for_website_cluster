@@ -37,8 +37,32 @@
     dest: /tomcat/tomcat/conf
 #缓存配置完   
 
+#拷贝启动脚本（使用www启动tomcat）
+- name: cp tomcat-start as www sh file
+  template:
+    src: start-www.sh.j2
+    dest: /tomcat/tomcat/bin/start-www.sh
+    mode: '0750'
+#拷贝关闭脚本（使用www关闭tomcat）
+- name: cp tomcat-stop as www sh file
+  template:
+    src: stop-www.sh.j2
+    dest: /tomcat/tomcat/bin/stop-www.sh
+    mode: '0750'
 
+#chown -R www.www /tomcat
+- name: chown -R www. /tomcat
+  file:
+    path: /tomcat
+    state: directory
+    owner: www
+    group: www
+    mode: '0750'
+    recurse: yes
+#加入开机启动
+#- name: enabled tomcat start host
+  
  
 - name: Started Tomcat Web Server
   shell: cd /tomcat/tomcat/bin &&
-         nohup ./startup.sh &
+         nohup ./start-www.sh &

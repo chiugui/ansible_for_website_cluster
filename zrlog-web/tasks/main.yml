@@ -15,11 +15,6 @@
     src: ROOT.war
     dest: "{{ web_code }}/{{ zrlog }}"
 
-#重启tomcat自动解压ROOT.war包，生成ROOT目录
-- name: Restart Tomcat Service
-  shell: cd /tomcat/tomcat/bin &&
-         nohup ./shutdown.sh &&
-         nohup ./startup.sh &
 
 
 
@@ -27,12 +22,31 @@
   template:
     src: index.jsp.j2
     dest: "{{ web_code }}/redis/ROOT/index.jsp"
+    backup: yes
+#
+#chown -R www.www /code/zrlog
+- name: chown -R www. /code/zrlog
+  file:
+    path: /code/zrlog
+    state: directory
+    owner: www
+    group: www
+    mode: '0750'
+    recurse: yes
 
+#添加zrlog虚拟主机
 - name: add vhost "{{ vhost_name }}" for zrlog
   template:
     src: server.xml.j2
     dest: /tomcat/tomcat/conf/server.xml
+    backup: yes
   notify: Restart Tomcat Service
+
+#重启tomcat自动解压ROOT.war包，生成ROOT目录
+- name: Restart Tomcat Service
+  shell: cd /tomcat/tomcat/bin &&
+         nohup ./stop-www.sh &&
+         nohup ./start-www.sh &
 
 #负载均衡调度静态资源到nginx上处理，这里创建一个虚拟主机来接收请求，虚拟主机的root目录和tomcat目录应该相同
 - name: nginx dealing with static resources, create vhost to nginx
@@ -44,12 +58,18 @@
 
 
 
+#mount前启动rpcbind服务
+- name: systemctl start and enable rpcbind
+  systemd:
+    name: rpcbind
+    state: restarted
+    enabled: yes
 
-#- name: mount "{{ vhost_name3 }}" static files to "{{ zrlog_dir }}"
-#  mount:
-#    src: "{{ nfs_vip }}:{{ zrlog_dir }}"
-#    path: "{{ web_code }}/{{ zrlog }}/ROOT/attached"
-#    opts: defaults
-#    fstype: nfs
-#    state: mounted
-#  ignore_errors: yes
+- name: mount "{{ vhost_name3 }}" static files to "{{ zrlog_dir }}"
+  mount:
+    src: "{{ nfs_vip }}:{{ zrlog_dir }}"
+    path: "{{ web_code }}/{{ zrlog }}/ROOT/attached"
+    opts: defaults
+    fstype: nfs
+    state: mounted
+  ignore_errors: yes

@@ -1,7 +1,7 @@
 - name: Restart Tomcat Service
   shell: cd /tomcat/tomcat/bin &&
-         nohup ./shutdown.sh &&
-         nohup ./startup.sh &
+         nohup ./stop-www.sh &&
+         nohup ./start-www.sh &
 
 - name: Restart Nginx Service
   systemd:

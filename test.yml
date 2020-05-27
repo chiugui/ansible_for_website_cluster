@@ -1,8 +1,10 @@
 #- hosts: all
 #  roles:
 #    - role: default
-- hosts: all
+- hosts: phpfpm
   roles:
     - role: base
+    - role: zh-web
+    - role: phpmyadmin-web
 
 
