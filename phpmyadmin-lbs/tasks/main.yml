@@ -4,6 +4,13 @@
     dest: "/etc/nginx/conf.d/proxy_{{ vhost_name }}.conf"
   notify: Restart Nginx Server
 
+#传送ssl证书到负载均衡上
+- name: unarchive https_ssl to lbs
+  unarchive:
+    src: https_chongking.com.zip
+    dest: /etc/nginx/
+
+
 - name: Check Proxy Confnigure 
   shell: nginx -t
   register: check_ngx

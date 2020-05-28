@@ -1,0 +1,66 @@
+#配置zabbixrepo源
+- name: add zabbix server repository
+  copy:
+    src: zabbix.repo
+    dest: /etc/yum.repos.d/zabbix.repo
+    mode: '0644'
+
+#安装zabbix-server-mysql zabbix-web-mysql zabbix-agent
+- name:  Install Zabbix server, frontend, agent
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - MySQL-python
+    - zabbix-server-mysql
+    - zabbix-web-mysql
+    - mariadb
+    - mariadb-server
+
+#启动数据库
+- name: started and enabled mariadb
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+#创建zabbix数据库
+- name: Create initial database
+  mysql_db:
+    name: zabbix
+    state: present
+    encoding: utf8
+    collation: utf8_bin
+- name: create initial database user
+  mysql_user:
+    name: zabbix
+    password: "{{ zabbix_db_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    host: localhost
+
+#导入zabbix数据库
+- name: zcat zbbix sql
+  shell: "zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -p zabbix -p{{ zabbix_db_password }}"
+#配置zabbix-server (/etc/zabbix/zabbix_server.conf)修改DBPassword=xxx
+- name: Configure the database for Zabbix server
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    group: zabbix
+#配置php配置文件( /etc/httpd/conf.d/zabbix.conf )
+- name: Configure PHP for Zabbix frontend 
+  copy:
+    src: zabbix.conf
+    dest:  /etc/httpd/conf.d/zabbix.conf
+
+#启动并加入开机自启zabbix-server zabbix-agent httpd
+- name: Start Zabbix server and agent processes and make it start at system boot.
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - zabbix-server
+    - httpd
+  

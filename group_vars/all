@@ -94,3 +94,8 @@ keepalived_vip: '172.16.1.2'
 #keepalived_vip var to group_vars/mysql
 #keepalived_interface: eth0
 #keepalived_vip: '172.16.1.2'
+
+
+#zabbix-server vars
+zabbix_db_password: 123456
+zabbix_server_ip: 172.16.1.4
