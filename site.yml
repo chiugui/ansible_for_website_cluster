@@ -1,48 +1,44 @@
 #初始化主机ip地址和hostname
-#- hosts: all
-#  roles:
-#    - role: default
-#
+- hosts: all
+  roles:
+    - role: default
+
 #优化主机（关闭防火墙selinux，配置repo等）
-#- hosts: all
-#  roles:
-#    - role: base
-#- hosts: manger
-#  roles:
-#    - role: zabbix-server
+- hosts: all
+  roles:
+    - role: base
+
+#安装zabbix-server端   
+- hosts: manger
+  roles:
+    - role: zabbix-server
 
 
+- hosts: redis
+  roles:
+    - role: redis
+- hosts: rsync
+  roles:
+    - role: rsync
 
+
+- hosts: nfs
+  roles:
+    - role: nfs
+- hosts: mysql
+  roles:
+    - role: mysql
 
 #- hosts: phpfpm
 #  roles:
 #    - role: nginx
 #    - role: php-fpm
+#- hosts: lbs
+#  roles:
+#    - role: keepalived
+#搭建网站时候会dependencies keepalived role，设置vip
 
-#
-#
-#
-#- hosts: redis
-#  roles:
-#    - role: redis
-#- hosts: rsync
-#  roles:
-#    - role: rsync
-#
-#
-#- hosts: nfs
-#  roles:
-#    - role: nfs
-#- hosts: mysql
-#  roles:
-#    - role: mysql
-#
-#
-##- hosts: lbs
-##  roles:
-##    - role: keepalived
-##搭建网站时候会dependencies keepalived role，设置vip
-##phpmyadmin网站搭建 
+#phpmyadmin网站搭建 
 - hosts: phpfpm
   roles:
     - role: phpmyadmin-web
@@ -64,8 +60,6 @@
 - hosts: tomcat
   roles:
     - role: zrlog-web
-  tags: zrlog
-
 - hosts: lbs
   roles:
     - role: zrlog-lbs

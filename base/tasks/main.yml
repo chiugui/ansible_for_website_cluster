@@ -55,8 +55,8 @@
   yum_repository:
     name: php-fpm
     description: PHP-FPM YUM repo
-#    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
-    baseurl: http://www.chongking.com/php-fpm/
+    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
+#    baseurl: http://www.chongking.com/php-fpm/
     gpgcheck: no
   when: ( ansible_hostname is match (".*phpfpm.*") )
 
@@ -71,7 +71,6 @@
     state: present
   loop:
       - net-tools
-      - nfs-utils
       - wget
       - tree
       - lrzsz

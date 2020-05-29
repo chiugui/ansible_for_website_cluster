@@ -1,8 +1,0 @@
-
-- hosts: phpfpm
-  roles:
-    - role: default
-    - role: base
-    - role: wp-web
-
-

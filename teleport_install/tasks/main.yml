@@ -1,0 +1,12 @@
+#安装teleport
+- name: copy teleport_install.sh to /scripts
+  copy:
+    src: teleport_install.sh
+    dest: /scripts/teleport_install.sh
+    mode: u+x
+- name: copy teleport.tar.gz to /
+  copy:
+    src: teleport-server-linux-x64-3.2.2.tar.gz
+    dest: /teleport-server-linux-x64-3.2.2.tar.gz
+- name: install teleport
+  shell: sh /scripts/teleport_install.sh

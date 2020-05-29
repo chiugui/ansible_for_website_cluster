@@ -1,23 +1,4 @@
-#[phpfpm]
-#172.16.1.18 hostname=web01
-#172.16.1.22 hostname=web03
-#
-#[tomcat]
-#172.16.1.19 hostname=web02
-#
-#[lbs]
-#172.16.1.16 hostname=lb01 keepalived_state=MASTER keepalived_priority=150
-#172.16.1.17 hostname=lb02 keepalived_state=BACKUP keepalived_priority=120
-#
-#[redis]
-#172.16.1.20 hostname=redis
-#
-#[nfs]
-#172.16.1.21 hostname=nfs
-#
-#[webtest]
-#172.16.1.23 hostname=webtest
-#
+
 [tomcat]
 172.16.1.16       hostname=cqecs-web-tomcat01
 
@@ -42,4 +23,4 @@
 172.16.1.27        hostname=cqecs-share-nfs01
 
 [manger]
-172.16.1.4       hostname=cqecs-manger-ssh01
+172.16.1.116       hostname=cqecs-manger-ssh01
