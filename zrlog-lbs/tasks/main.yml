@@ -1,7 +1,7 @@
 #使用nginx配置zrlog的负载均衡proxy_zrlog(附带redis.osker.com的负载均衡),如果配置文件发生改变，触发restart nginx
 - name: configure proxy zrlog.xxx.com 
   template:
-    src: "proxy_{{ vhost_name3 }}.conf.j2"
+    src: proxy_zrlog.com.conf.j2
     dest: "/etc/nginx/conf.d/proxy_{{ vhost_name3 }}.conf"
     backup: yes
   notify: Restart Nginx Service

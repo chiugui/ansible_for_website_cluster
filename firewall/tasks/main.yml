@@ -1,0 +1,67 @@
+#开启防火墙
+- name: started firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+#将eth0添加到trusted区
+- name: add eth0 to zone=trusted
+  firewalld:
+    zone: trusted
+    immediate: yes
+    permanent: yes
+    state: enabled
+    interface: eth0
+
+#将eth1添加到external区
+- name: add eth0 to zone=external
+  firewalld:
+    zone: external
+    immediate: yes
+    permanent: yes
+    state: enabled
+    interface: eth1
+
+- name: allow http and https at eth1
+  firewalld:
+    zone: external
+    state: enabled
+    service: "{{ item }}"
+    permanent: yes
+  loop:
+    - http
+    - https
+
+- name: denly ssh at "{{ ansible_hostname }}" eth1
+  firewalld:
+    zone: external
+    state: disabled
+    service: ssh
+    permanent: yes
+  when: ( ansible_hostname is match ('.*lbs.*'))
+
+#默认external区域开启masquerade，在lbs上面最好关闭此功能。
+- name: remove masquerade at "{{ ansible_hostname }}" eth1
+  firewalld:
+    zone: external
+    masquerade: enabled
+    permanent: yes
+    state: disabled
+  when: ( ansible_hostname is match ('.*lbs.*'))
+
+- name: allow some service port at "{{ ansible_hostname }}" eth1
+  firewalld:
+    zone: external
+    state: "{{ item.state }}"
+    port: "{{ item.port }}"
+    permanent: yes
+  loop:
+    - { port: 7190/tcp, state: enabled }
+    - { port: 1194/tcp, state: enabled }
+  when: ( ansible_hostname is match ('.*manger.*'))
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded

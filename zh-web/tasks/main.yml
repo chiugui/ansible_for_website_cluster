@@ -10,7 +10,7 @@
 
 - name: add "{{ vhost_name2 }}" vhost to nginx
   template:
-    src: "{{ vhost_name2 }}.conf.j2"
+    src: zh.com.conf.j2
     dest: "/etc/nginx/conf.d/{{ vhost_name2 }}.conf"
   notify: Restart Nginx Server
 
@@ -27,7 +27,7 @@
 - name: mount "{{ vhost_name2 }}" static files to "{{ wecenter_dir }}"
   mount:
     src: "{{ nfs_vip }}:{{ wecenter_dir }}"
-    path: "{{ web_code }}/{{ wecenter }}/uploads"
+    path: "{{ web_code }}/{{ wecenter }}/wp-content"
     opts: defaults
     fstype: nfs
     state: mounted

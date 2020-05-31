@@ -1,0 +1,5 @@
+#初始化主机ip地址和hostname
+- hosts: all
+  roles:
+    - role: default
+

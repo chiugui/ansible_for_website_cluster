@@ -1,3 +1,0 @@
-- hosts: manger
-  roles:
-    - role: teleport_install

@@ -18,7 +18,7 @@
 
 
 
-- name: template redis.osker.com code(index.jsp)
+- name: template redis.xxx.com code(index.jsp)
   template:
     src: index.jsp.j2
     dest: "{{ web_code }}/redis/ROOT/index.jsp"
@@ -51,7 +51,7 @@
 #负载均衡调度静态资源到nginx上处理，这里创建一个虚拟主机来接收请求，虚拟主机的root目录和tomcat目录应该相同
 - name: nginx dealing with static resources, create vhost to nginx
   template:
-    src: "{{ vhost_name3 }}.conf.j2"
+    src: zrlog.com.conf.j2
     dest: "/etc/nginx/conf.d/{{ vhost_name3 }}.conf"
     backup: yes
   notify: Restart Nginx Service

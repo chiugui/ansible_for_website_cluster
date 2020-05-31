@@ -1,0 +1,89 @@
+#Dynamic resources
+upstream {{ vhost_name3 }}{{ tomcat_port3 }} {
+{% for host in groups['tomcat'] %}
+	server {{ host }}:{{ tomcat_port3 }};
+{% endfor %}
+}
+
+#static resources
+upstream {{ vhost_name3 }}{{ nginx_port3 }} {
+{% for host in groups['tomcat'] %}
+	server {{ host }}:{{ nginx_port3 }};
+{% endfor %}
+}
+
+
+#tomcat test redis session
+upstream {{ vhost_name4 }} { 	
+{% for host in groups['tomcat'] %}
+        server {{ host }}:{{ tomcat_port3 }};
+{% endfor %}
+}
+
+	
+
+server {
+	listen 80;
+	server_name {{ vhost_name3 }};
+	return 302 https://$server_name$request_uri;
+}
+server {
+	listen 443 ssl;
+	server_name  {{ vhost_name3 }};
+	ssl_certificate     "fullchain.crt";
+	ssl_certificate_key "private.pem";
+	ssl_protocols       TLSv1.1 TLSv1.2;
+	keepalive_timeout   70;
+	ssl_session_cache   shared:SSL:10m;
+	ssl_session_timeout 10m;
+
+	#Dispatch to static resources
+	location ~* \.(png|gif|jpg)$ {
+		proxy_pass http://{{ vhost_name3 }}{{ nginx_port3 }};
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+	#Dispatch to dynamic resources
+	location / {
+		proxy_pass http://{{ vhost_name3 }}{{ tomcat_port3 }};
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+}
+
+
+
+
+
+
+
+server {
+        listen 80;
+        server_name {{ vhost_name4 }};
+	return 302 https://$server_name$request_uri;	
+}
+
+
+server {
+        listen 443 ssl;
+        server_name  	{{ vhost_name4 }};
+	ssl_certificate     "fullchain.crt";
+	ssl_certificate_key "private.pem";
+        ssl_protocols       TLSv1.1 TLSv1.2;
+        keepalive_timeout   70;
+        ssl_session_cache   shared:SSL:10m;
+        ssl_session_timeout 10m;
+
+        location / {
+                proxy_pass http://{{ vhost_name4 }};
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+}
+
+
+

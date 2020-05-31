@@ -1,0 +1,17 @@
+server  {
+	listen {{ nginx_port }};
+	server_name {{ vhost_name }};
+	root {{ web_code }}/{{ phpmyadmin }};
+	client_max_body_size 100m;
+
+	location / {
+		index index.php;
+	}
+
+	location ~ \.php$ {
+		fastcgi_pass 127.0.0.1:9000;
+#		fastcgi_param HTTPS on;  ###若前端负载均衡使用https，需要加上此参数。不然会网页格式会乱。
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		include fastcgi_params;
+	}
+}

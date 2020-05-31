@@ -5,20 +5,26 @@
 #    src: "{{ eth1 }}.j2"
 #    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ eth1 }}"
 #    backup: yes
-#  when: ( ansible_hostname is match ("*lbs*") )
+#  when: ( ansible_hostname is match (".*lbs.*") )
 
-#1.关闭firewalld防火墙
+#1.关闭所有主机的firewalld防火墙
 - name: Disabled Firewall Server
   systemd:
     name: firewalld
     state: stopped
     enabled: no
 
+#开启manger组和lbs组主机的firewalld防火墙
+- name: started manger group and lbs group hosts Firewall Server
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: ( ansible_hostname is match (".*manger.*") ) or  ( ansible_hostname is match (".*lbs.*") ) 
 #2.关闭selinux
 - name: Disabled Selinux Server
   selinux:
     state: disabled
-
 
 ###delete old yum repos
 - name: mv  old-repo files
@@ -55,14 +61,16 @@
   yum_repository:
     name: php-fpm
     description: PHP-FPM YUM repo
-    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
-#    baseurl: http://www.chongking.com/php-fpm/
+#    baseurl: http://us-east.repo.webtatic.com/yum/el7/x86_64/
+    baseurl: http://192.168.199.191/yum/el7/x86_64/
+#    baseurl: http://osker.ml/php-fpm/  #我的外网源
     gpgcheck: no
   when: ( ansible_hostname is match (".*phpfpm.*") )
 
 #yum makecache
 - name: yum makecache
-  shell: yum makecache
+  yum:
+    update_cache: yes
 
 #5.安装基础软件包
 - name: Install base rpms packages

@@ -1,0 +1,36 @@
+upstream {{ vhost_name }} {
+
+{% for host in groups['phpfpm'] %}
+server {{ host }}:{{ nginx_port }};
+{% endfor %}
+}
+
+server {
+	listen 80;
+	server_name {{ vhost_name }};
+	location / {
+	return 302 https://$server_name$request_uri;
+	}
+
+}
+
+server {
+        listen 443 ssl;
+        server_name  	 {{ vhost_name }};
+	ssl_certificate     "fullchain.crt";
+	ssl_certificate_key "private.pem";
+        ssl_protocols       TLSv1.1 TLSv1.2;
+        keepalive_timeout   70;
+        ssl_session_cache   shared:SSL:10m;
+        ssl_session_timeout 10m;
+
+        location / {
+                proxy_pass http://{{ vhost_name }};
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+}
+
+
+

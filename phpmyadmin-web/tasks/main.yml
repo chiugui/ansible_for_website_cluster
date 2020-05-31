@@ -17,7 +17,7 @@
 
 - name: add "{{ vhost_name }}"vhost to nginx
   template:
-    src: "{{ vhost_name }}.conf.j2"
+    src: php.com.conf.j2
     dest: "/etc/nginx/conf.d/{{ vhost_name }}.conf"
   notify: Restart Nginx Server    
 

@@ -1,0 +1,8 @@
+
+#manger主机和lbs对外有公网ip的主机配置防火墙规则
+- hosts: lbs
+  roles:
+    - role: firewall
+- hosts: manger
+  roles:
+    - role: firewall

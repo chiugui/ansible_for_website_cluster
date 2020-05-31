@@ -1,6 +1,6 @@
 - name: configure proxy "{{ vhost_name2 }}" 
   template:
-    src: "proxy_{{ vhost_name2 }}.conf.j2"
+    src: proxy_zh.com.conf.j2
     dest: "/etc/nginx/conf.d/proxy_{{ vhost_name2 }}.conf"
     backup: yes
   notify: Restart Nginx Service

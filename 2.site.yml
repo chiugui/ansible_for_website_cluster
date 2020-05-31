@@ -1,0 +1,65 @@
+#优化主机（关闭防火墙selinux，配置repo等）
+- hosts: all
+  roles:
+    - role: base
+  tags: base
+#安装zabbix-server端   
+- hosts: manger
+  roles:
+    - role: zabbix-server
+
+
+- hosts: redis
+  roles:
+    - role: redis
+- hosts: rsync
+  roles:
+    - role: rsync
+
+
+- hosts: nfs
+  roles:
+    - role: nfs
+- hosts: mysql
+  roles:
+    - role: mysql
+
+#开启lbs高可用
+- hosts: lbs
+  roles:
+    - role: keepalived
+  tags: keepalived
+
+#- hosts: phpfpm
+#  roles:
+#    - role: nginx
+#    - role: php-fpm
+
+
+#phpmyadmin网站搭建 
+- hosts: phpfpm
+  roles:
+    - role: phpmyadmin-web
+- hosts: lbs
+  roles:
+  - role: phpmyadmin-lbs
+
+#调试wecenter
+- hosts: phpfpm
+  roles:
+    - role: zh-web
+- hosts: lbs
+  roles:
+    - role: zh-lbs
+  tags: zh
+#
+#部署zrlog web时会dependencies nginx和tomcat
+- hosts: tomcat
+  roles:
+    - role: zrlog-web
+- hosts: lbs
+  roles:
+    - role: zrlog-lbs
+  tags: zrlog
+
+
