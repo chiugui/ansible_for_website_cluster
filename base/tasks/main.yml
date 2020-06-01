@@ -13,7 +13,8 @@
     name: firewalld
     state: stopped
     enabled: no
-
+  #when: ( ansible_host is not match (".*manger.*") )
+  
 #开启manger组和lbs组主机的firewalld防火墙
 - name: started manger group and lbs group hosts Firewall Server
   systemd:

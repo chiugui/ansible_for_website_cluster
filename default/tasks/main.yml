@@ -16,13 +16,14 @@
 #  template:
 #    src: resolv.conf.j2
 #    dest: /etc/resolv.conf
-   
+
+#将主机清单中的hostname设置为主机名   
 - name: reset hostname
   hostname:
     name: "{{ hostname }}" 
 
 
-
+#重启网卡加载网卡配置
 - name: restart network
   systemd:
     name: network
