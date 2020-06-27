@@ -42,6 +42,7 @@
 #导入zabbix数据库
 - name: zcat zbbix sql
   shell: "zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -p zabbix -p{{ zabbix_db_password }}"
+
 #配置zabbix-server (/etc/zabbix/zabbix_server.conf)修改DBPassword=xxx
 - name: Configure the database for Zabbix server
   template:
